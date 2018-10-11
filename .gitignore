@@ -1,0 +1,5 @@
+*.pyc
+djangocase/__pycache__/
+/__pycache__/
+myvenv/
+djangocase/db.sqlite3
