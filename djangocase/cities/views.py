@@ -1,8 +1,41 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
+from .models import City, Hotel
+
+# part of the data, can be used in case the http connection doesn't work, otherwise comment it out
+cities_data = [['AMS', 'Amsterdam'], ['ANT', 'Antwerpen'], ['ATH', 'Athene'], ['BAK', 'Bangkok'], ['BAR', 'Barcelona'], ['BER', 'Berlijn']]
+hotel_data = [['AMS', 'AMS01', 'Ibis Amsterdam Airport'], ['AMS', 'AMS02', 'Novotel Amsterdam Airport'], ['ANT', 'ANT01', 'Express by Holiday Inn'], ['ANT', 'ANT02', 'Eden'], ['ANT', 'ANT04', 'Astoria']]
+
+# index view showing a list of all cities
 def index(request):
-    return HttpResponse("This is the INDEX view")
+    for city in cities_data:
+        # check if the city coming in via the data is not already in the database
+        check = City.objects.filter(city_abbreviation = city[0])
+        # if not yet in the database, add it
+        if len(check) == 0:
+            new_city = City()
+            new_city.city_abbreviation = city[0]
+            new_city.city_name = city[1]
+            new_city.save()
+    cities = City.objects.all()
+    return render(request, 'cities/index.html', {'cities': cities})
     
+# city view showing all hotels for a city
 def city(request, city_id):
-    return HttpResponse("This is a CITY view")
+    # try and see if the city in the url exists
+    try:
+        my_city = City.objects.get(pk = city_id)
+        # add new hotel data to database
+        for hotel in hotel_data:
+            # only attempt to add a hotel to database if it is situated in the city that was selected
+            if my_city.city_abbreviation == hotel[0]: 
+                # check if the hotel exists in the city already
+                check = my_city.hotel_set.filter(hotel_code = hotel[1], hotel_name = hotel[2])
+                # if it does not exist yet, add it to the database
+                if len(check) == 0:
+                    new_hotel = Hotel(hotel_city = hotel[0], hotel_code = hotel[1], hotel_name = hotel[2], city=my_city)
+                    new_hotel.save()
+    except (KeyError, City.DoesNotExist):
+        return HttpResponse("That city does not exist.")
+    return render(request, 'cities/city.html', {'city': my_city})  

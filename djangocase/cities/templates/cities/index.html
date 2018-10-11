@@ -6,4 +6,10 @@
 
 <body>
 <h1>Cities with hotels</h1>
+<br>
+<ul>
+    {% for city in cities %}
+    <h2><a href="{% url 'cities:city' city.id %}">{{ city.city_name }}</a></h2>
+    {% endfor %}
+</ul>
 </body>

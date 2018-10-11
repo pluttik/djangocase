@@ -5,5 +5,11 @@
 </head>
 
 <body>
-<h1>Hotels in city X</h1>
+<h1>Hotels in city {{ city.city_name }}</h1>
+<br>
+<ul>
+    {% for hotel in city.hotel_set.all %}
+    <h2>{{ hotel.hotel_name }}</h2>
+    {% endfor %}
+</ul>
 </body>
