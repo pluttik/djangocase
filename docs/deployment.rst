@@ -7,4 +7,4 @@ The project's secret ket is named DJANGOCASE_SECRET_KEY and is loaded via an env
 Data API authentication
 =======================
 
-The data are obtained from http://rachel.maykinmedia.nl/djangocase/city.csv and 'http://rachel.maykinmedia.nl/djangocase/hotel.csv and the password for these is loaded via an environment variables.
+The data are obtained from http://rachel.maykinmedia.nl/djangocase/city.csv and 'http://rachel.maykinmedia.nl/djangocase/hotel.csv and the password for these is loaded via an environment variable called DJANGOCASE_PASSWORD.

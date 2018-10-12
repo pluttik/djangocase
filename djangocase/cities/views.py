@@ -1,11 +1,29 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
+import requests, csv, os
+
 from .models import City, Hotel
 
-# part of the data, can be used in case the http connection doesn't work, otherwise comment it out
-cities_data = [['AMS', 'Amsterdam'], ['ANT', 'Antwerpen'], ['ATH', 'Athene'], ['BAK', 'Bangkok'], ['BAR', 'Barcelona'], ['BER', 'Berlijn']]
-hotel_data = [['AMS', 'AMS01', 'Ibis Amsterdam Airport'], ['AMS', 'AMS02', 'Novotel Amsterdam Airport'], ['ANT', 'ANT01', 'Express by Holiday Inn'], ['ANT', 'ANT02', 'Eden'], ['ANT', 'ANT04', 'Astoria']]
+
+djangocase_password = os.environ["DJANGOCASE_PASSWORD"]
+
+requests_hotel = requests.get('http://rachel.maykinmedia.nl/djangocase/hotel.csv', auth=('python-demo', djangocase_password))
+requests_city = requests.get('http://rachel.maykinmedia.nl/djangocase/city.csv', auth=('python-demo', djangocase_password))
+
+decoded_content_hotel = requests_hotel.content.decode('utf-8')
+reader_hotel = csv.reader(decoded_content_hotel.splitlines(), delimiter=';')
+hotel_data = list(reader_hotel)
+
+decoded_content_city = requests_city.content.decode('utf-8')
+reader_city = csv.reader(decoded_content_city.splitlines(), delimiter=';')
+cities_data = list(reader_city)
+
+
+# below is part of the data. This can be used in case the http connection doesn't work, otherwise comment it out
+#cities_data = [['AMS', 'Amsterdam'], ['ANT', 'Antwerpen'], ['ATH', 'Athene'], ['BAK', 'Bangkok'], ['BAR', 'Barcelona'], ['BER', 'Berlijn']]
+#hotel_data = [['AMS', 'AMS01', 'Ibis Amsterdam Airport'], ['AMS', 'AMS02', 'Novotel Amsterdam Airport'], ['ANT', 'ANT01', 'Express by Holiday Inn'], ['ANT', 'ANT02', 'Eden'], ['ANT', 'ANT04', 'Astoria']]
+
 
 # index view showing a list of all cities
 def index(request):
@@ -19,7 +37,11 @@ def index(request):
             new_city.city_name = city[1]
             new_city.save()
     cities = City.objects.all()
-    return render(request, 'cities/index.html', {'cities': cities})
+    if len(cities) == 0:
+        return HttpResponse("No cities are available.")
+    else:
+        return render(request, 'cities/index.html', {'cities': cities})
+    
     
 # city view showing all hotels for a city
 def city(request, city_id):
