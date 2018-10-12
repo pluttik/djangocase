@@ -27,15 +27,12 @@ cities_data = list(reader_city)
 
 # index view showing a list of all cities
 def index(request):
+    City.objects.all().delete()
     for city in cities_data:
-        # check if the city coming in via the data is not already in the database
-        check = City.objects.filter(city_abbreviation = city[0])
-        # if not yet in the database, add it
-        if len(check) == 0:
-            new_city = City()
-            new_city.city_abbreviation = city[0]
-            new_city.city_name = city[1]
-            new_city.save()
+        new_city = City()
+        new_city.city_abbreviation = city[0]
+        new_city.city_name = city[1]
+        new_city.save()
     cities = City.objects.all()
     if len(cities) == 0:
         return HttpResponse("No cities are available.")
@@ -45,6 +42,7 @@ def index(request):
     
 # city view showing all hotels for a city
 def city(request, city_id):
+    Hotel.objects.all().delete()
     # try and see if the city in the url exists
     try:
         my_city = City.objects.get(pk = city_id)
@@ -53,7 +51,10 @@ def city(request, city_id):
             # only attempt to add a hotel to database if it is situated in the city that was selected
             if my_city.city_abbreviation == hotel[0]: 
                 # check if the hotel exists in the city already
-                check = my_city.hotel_set.filter(hotel_code = hotel[1], hotel_name = hotel[2])
+                # note that there are DUPLICATE hotel names, but they have unique hotel codes
+                # check = my_city.hotel_set.filter(hotel_code = hotel[1], hotel_name = hotel[2])
+                # swap the line above for the one below if you want NO DUPLICATES
+                check = my_city.hotel_set.filter(hotel_name = hotel[2])
                 # if it does not exist yet, add it to the database
                 if len(check) == 0:
                     new_hotel = Hotel(hotel_city = hotel[0], hotel_code = hotel[1], hotel_name = hotel[2], city=my_city)
