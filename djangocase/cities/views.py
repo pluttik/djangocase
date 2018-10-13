@@ -57,7 +57,7 @@ def get_data(source): #api or csv
                 
 # index view showing a list of all cities
 def index(request):
-    get_data('api')
+    get_data('csv')
     cities = City.objects.all()
     # show error message if no cities are in the database
     if len(cities) == 0:
