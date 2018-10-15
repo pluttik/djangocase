@@ -8,3 +8,9 @@ Data API authentication
 =======================
 
 The data are obtained from http://rachel.maykinmedia.nl/djangocase/city.csv and 'http://rachel.maykinmedia.nl/djangocase/hotel.csv and the password for these is loaded via an environment variable called DJANGOCASE_PASSWORD.
+
+
+APScheduler
+===========
+
+The database is loaded from HTTP every 24 hours. The first time will be 24 hours after deployment.

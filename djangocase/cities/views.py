@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from apscheduler.schedulers.background import BackgroundScheduler
 
 import requests, csv, os
 
@@ -8,6 +9,19 @@ from .models import City, Hotel
 
 djangocase_password = os.environ["DJANGOCASE_PASSWORD"]
 
+
+def tick(): #api or csv
+    get_data('csv')
+    print('(Re-)loaded the data')
+
+def start_job():
+    global job
+    job = scheduler.add_job(tick, 'interval', hours=24)
+    try:
+        scheduler.start()
+    except:
+        pass
+        
 def get_data(source): #api or csv
     cities_data = []
     hotel_data=[]
@@ -32,8 +46,6 @@ def get_data(source): #api or csv
             reader_hotel = csv.reader(csvfile, delimiter=';')
             hotel_data = list(reader_hotel)
         csvfile.close()
-        #cities_data = [['AMS', 'Amsterdam'], ['ANT', 'Antwerpen'], ['ATH', 'Athene'], ['BAK', 'Bangkok'], ['BAR', 'Barcelona'], ['BER', 'Berlijn']]
-        #hotel_data = [['AMS', 'AMS01', 'Ibis Amsterdam Airport'], ['AMS', 'AMS02', 'Novotel Amsterdam Airport'], ['ANT', 'ANT01', 'Express by Holiday Inn'], ['ANT', 'ANT02', 'Eden'], ['ANT', 'ANT04', 'Astoria']]
 
     # add city data to database
     for city in cities_data:
@@ -57,7 +69,6 @@ def get_data(source): #api or csv
                 
 # index view showing a list of all cities
 def index(request):
-    get_data('csv')
     cities = City.objects.all()
     # show error message if no cities are in the database
     if len(cities) == 0:
@@ -74,3 +85,9 @@ def city(request, city_id):
     except (KeyError, City.DoesNotExist):
         return HttpResponse("That city does not exist.")
     return render(request, 'cities/city.html', {'city': my_city})  
+    
+    
+#get_data('csv')
+scheduler = BackgroundScheduler()
+job = None
+start_job()
