@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from apscheduler.schedulers.background import BackgroundScheduler
+from django.core import serializers
 
 import requests, csv, os
 
@@ -10,10 +11,12 @@ from .models import City, Hotel
 djangocase_password = os.environ["DJANGOCASE_PASSWORD"]
 
 
+# the first two function take care of daily database HTTP scheduling
 def tick(): #api or csv
-    get_data('csv')
+    get_data('api')
     print('(Re-)loaded the data')
 
+    
 def start_job():
     global job
     job = scheduler.add_job(tick, 'interval', hours=24)
@@ -21,7 +24,9 @@ def start_job():
         scheduler.start()
     except:
         pass
+
         
+# function to get the data either via api or from csv files
 def get_data(source): #api or csv
     cities_data = []
     hotel_data=[]
@@ -86,6 +91,13 @@ def city(request, city_id):
         return HttpResponse("That city does not exist.")
     return render(request, 'cities/city.html', {'city': my_city})  
     
+
+# all_json_hotels view for filling drop-down menu in index view
+def all_json_hotels(request, city_name):
+    current_city = City.objects.get(city_name = city_name)
+    hotels = Hotel.objects.all().filter(city = current_city)
+    json_hotels = serializers.serialize("json", hotels)
+    return HttpResponse(json_hotels)
     
 #get_data('csv')
 scheduler = BackgroundScheduler()

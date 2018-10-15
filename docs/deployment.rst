@@ -1,7 +1,7 @@
 Django project secret key
 =========================
 
-The project's secret ket is named DJANGOCASE_SECRET_KEY and is loaded via an environment variable. You have received it from me by e-mail in a separate file.
+The project's secret ket is named DJANGOCASE_SECRET_KEY and is loaded via an environment variable. You have received it from me by e-mail.
 
 
 Data API authentication
