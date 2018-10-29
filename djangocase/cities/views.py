@@ -11,13 +11,16 @@ from .models import City, Hotel
 djangocase_password = os.environ["DJANGOCASE_PASSWORD"]
 
 
-# the first two function take care of daily database HTTP scheduling
+# the first two functions take care of daily database HTTP scheduling
+
 def tick(): #api or csv
-    get_data('api')
+    """Get the data from the designated source."""
+    get_data('csv')
     print('(Re-)loaded the data')
 
     
 def start_job():
+    """Time scheduler."""
     global job
     job = scheduler.add_job(tick, 'interval', hours=24)
     try:
@@ -26,8 +29,8 @@ def start_job():
         pass
 
         
-# function to get the data either via api or from csv files
 def get_data(source): #api or csv
+    """Get the data, either via api or from csv files."""
     cities_data = []
     hotel_data=[]
     City.objects.all().delete()
@@ -72,8 +75,8 @@ def get_data(source): #api or csv
                 new_hotel.save()
     
                 
-# index view showing a list of all cities
 def index(request):
+    """Index view showing a list of all cities."""
     cities = City.objects.all()
     # show error message if no cities are in the database
     if len(cities) == 0:
@@ -82,8 +85,8 @@ def index(request):
         return render(request, 'cities/index.html', {'cities': cities})
     
     
-# city view showing all hotels for a city
 def city(request, city_id):
+    """City view showing all hotels for a city."""
     # try and see if the city in the url exists
     try:
         my_city = City.objects.get(pk = city_id)
@@ -92,8 +95,8 @@ def city(request, city_id):
     return render(request, 'cities/city.html', {'city': my_city})  
     
 
-# all_json_hotels view for filling drop-down menu in index view
 def all_json_hotels(request, city_name):
+    """All_json_hotels view for filling drop-down menu in index view."""
     current_city = City.objects.get(city_name = city_name)
     hotels = Hotel.objects.all().filter(city = current_city)
     json_hotels = serializers.serialize("json", hotels)
