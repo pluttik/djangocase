@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.core.management import call_command
 from apscheduler.schedulers.background import BackgroundScheduler
 from django.core import serializers
 
@@ -13,16 +14,17 @@ djangocase_password = os.environ["DJANGOCASE_PASSWORD"]
 
 # the first two functions take care of daily database HTTP scheduling
 
-def tick(): #api or csv
+def tick(input_type): #api or csv
     """Get the data from the designated source."""
-    get_data('csv')
+    #get_data('csv')
+    get_data(input_type)
     print('(Re-)loaded the data')
 
     
 def start_job():
     """Time scheduler."""
     global job
-    job = scheduler.add_job(tick, 'interval', hours=24)
+    job = scheduler.add_job(lambda: tick(input_type), 'interval', hours=24)
     try:
         scheduler.start()
     except:
@@ -49,11 +51,9 @@ def get_data(source): #api or csv
         with open('cities/data/city.csv') as csvfile:
             reader_city = csv.reader(csvfile, delimiter=';')
             cities_data = list(reader_city)
-        csvfile.close()
         with open('cities/data/hotel.csv') as csvfile:
             reader_hotel = csv.reader(csvfile, delimiter=';')
             hotel_data = list(reader_hotel)
-        csvfile.close()
 
     # add city data to database
     for city in cities_data:
@@ -103,6 +103,7 @@ def all_json_hotels(request, city_name):
     return HttpResponse(json_hotels)
     
 #get_data('csv')
+call_command('load_data')
 scheduler = BackgroundScheduler()
 job = None
 start_job()

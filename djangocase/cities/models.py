@@ -9,7 +9,7 @@ class City(models.Model):
     
 class Hotel(models.Model):
     """Hotel model class."""
-    city = models.ForeignKey(City, on_delete=models.CASCADE)
+    city = models.ForeignKey('City', on_delete=models.CASCADE)
     hotel_city = models.CharField(max_length=50)
     hotel_code = models.CharField(max_length=50)
     hotel_name = models.CharField(max_length=400)
