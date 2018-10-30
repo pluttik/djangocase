@@ -35,7 +35,7 @@ def get_data(source): #api or csv
     """Get the data, either via api or from csv files."""
     cities_data = []
     hotel_data=[]
-    City.objects.all().delete()
+    #City.objects.all().delete()
     if source == 'api':
         requests_hotel = requests.get('http://rachel.maykinmedia.nl/djangocase/hotel.csv', auth=('python-demo', djangocase_password))
         requests_city = requests.get('http://rachel.maykinmedia.nl/djangocase/city.csv', auth=('python-demo', djangocase_password))
@@ -57,9 +57,7 @@ def get_data(source): #api or csv
 
     # add city data to database
     for city in cities_data:
-        new_city = City()
-        new_city.city_abbreviation = city[0]
-        new_city.city_name = city[1]
+        new_city, created = City.objects.get_or_create(city_name = city[1], city_abbreviation = city[0])
         new_city.save()
         # add hotel data to database
         hotel_data_here = [item for item in hotel_data if item[0] == city[0]]
@@ -71,7 +69,7 @@ def get_data(source): #api or csv
             check = new_city.hotel_set.filter(hotel_name = hotel[2])
             # if it does not exist yet, add it to the database
             if len(check) == 0:
-                new_hotel = Hotel(hotel_city = hotel[0], hotel_code = hotel[1], hotel_name = hotel[2], city=new_city)
+                new_hotel, created = Hotel.objects.get_or_create(hotel_city = hotel[0], hotel_code = hotel[1], hotel_name = hotel[2], city=new_city)
                 new_hotel.save()
     
                 
@@ -102,7 +100,6 @@ def all_json_hotels(request, city_name):
     json_hotels = serializers.serialize("json", hotels)
     return HttpResponse(json_hotels)
     
-#get_data('csv')
 call_command('load_data')
 scheduler = BackgroundScheduler()
 job = None
