@@ -1,40 +1,40 @@
 {% load static %}
 
+<html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="{% static 'cities/jquery-3.3.1.min.js' %}"></script>
-<link rel="stylesheet" type="text/css" href="{% static 'cities/style.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{% static 'cities/jquery-3.3.1.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'cities/style.css' %}">
 </head>
 
 <body>
-<!-- First: get the city data from the database and list it -->
-<h1>Cities with hotels</h1>
-<br>
-<ul>
+    <!-- First: get the city data from the database and list it -->
+    <h1>Cities with hotels</h1>
+    <br>
     {% for city in cities %}
-    <h2><a href="{% url 'cities:city' city.id %}">{{ city.city_name }}</a></h2>
+    <ul>
+    <p class="large_font"><a href="{% url 'cities:city' city.id %}">{{ city.city_name }}</a></p>
+    </ul>
     {% endfor %}
-</ul>
-<br>
+    <br>
 
-<!--Below: asynchronous request for the hotel data-->
-<h1>Alternative: select city from drop-down menu</h1>
+    <!--Below: asynchronous request for the hotel data-->
+    <h1>Alternative: select city from drop-down menu</h1>
 
-<form method="post" action=""> 
-    {% csrf_token %}
-    <select name="cities" id="cities">
-    <option value="Z">Select a city:</option>
-    {% for city in cities %}
-    <option value="{{ city.city_name }}">{{ city.city_name }}</option>
-    {% endfor %}
-    </select>
+    <form method="post" action=""> 
+        {% csrf_token %}
+        <select name="cities" id="cities">
+        <option value="Z">Select a city:</option>
+        {% for city in cities %}
+        <option value="{{ city.city_name }}">{{ city.city_name }}</option>
+        {% endfor %}
+        </select>
 
-    <select name="hotel" id="hotel" disabled="true">
-    <option>Select a hotel:</option>
-    </select>
-</form>
+        <select name="hotel" id="hotel" disabled="true">
+        <option>Select a hotel:</option>
+        </select>
+    </form>
 
-<script src="{% static 'cities/script.js' %}"></script>
-
+    <script src="{% static 'cities/script.js' %}"></script>
 </body>
 </html>

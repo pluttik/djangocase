@@ -1,16 +1,18 @@
 {% load static %}
 
+<html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" type="text/css" href="{% static 'cities/style.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'cities/style.css' %}">
 </head>
 
 <body>
-<h1>Hotels in city {{ city.city_name }}</h1>
-<br>
-<ul>
+    <h1>Hotels in city {{ city.city_name }}</h1>
+    <br>
     {% for hotel in city.hotel_set.all %}
-    <h2>{{ hotel.hotel_name }}</h2>
+    <ul>
+    <p class="large_font"> {{ hotel.hotel_name }} </p>
+    </ul>
     {% endfor %}
-</ul>
 </body>
+</html>
